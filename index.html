@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pygame Dodge the Blocks Code</title>
+    <style>
+        :root {
+            --bg-color: #1e1e2e;
+            --code-bg: #282a36;
+            --text-color: #f8f8f2;
+            --highlight-blue: #8be9fd;
+            --highlight-green: #50fa7b;
+            --highlight-purple: #bd93f9;
+            --highlight-orange: #ffb86c;
+            --highlight-pink: #ff79c6;
+            --highlight-comment: #6272a4;
+        }
+        
+        body {
+            font-family: 'Fira Code', monospace;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: linear-gradient(135deg, #44475a, #282a36);
+            border-radius: 10px;
+        }
+        
+        h1 {
+            color: var(--highlight-purple);
+            margin: 0;
+        }
+        
+        .subtitle {
+            color: var(--highlight-comment);
+            font-style: italic;
+        }
+        
+        .code-container {
+            background-color: var(--code-bg);
+            border-radius: 10px;
+            padding: 20px;
+            overflow-x: auto;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        pre {
+            margin: 0;
+            white-space: pre-wrap;
+            tab-size: 4;
+        }
+        
+        code {
+            font-family: 'Fira Code', monospace;
+            font-size: 14px;
+        }
+        
+        /* Syntax highlighting */
+        .keyword { color: var(--highlight-pink); }
+        .func { color: var(--highlight-green); }
+        .string { color: var(--highlight-orange); }
+        .comment { color: var(--highlight-comment); font-style: italic; }
+        .number { color: var(--highlight-purple); }
+        .operator { color: var(--highlight-blue); }
+        
+        .copy-btn {
+            display: block;
+            margin: 20px auto;
+            padding: 10px 20px;
+            background-color: var(--highlight-purple);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-family: 'Fira Code', monospace;
+            transition: background-color 0.3s;
+        }
+        
+        .copy-btn:hover {
+            background-color: var(--highlight-pink);
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 30px;
+            color: var(--highlight-comment);
+            font-size: 0.9em;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            code {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Dodge the Blocks! Pygame Code</h1>
+            <p class="subtitle">A simple obstacle avoidance game</p>
+        </header>
+        
+        <div class="code-container">
+            <pre><code><span class="keyword">import</span> pygame
+<span class="keyword">import</span> random
+<span class="keyword">import</span> sys
+
+<span class="comment"># Initialize Pygame</span>
+pygame.<span class="func">init</span>()
+
+<span class="comment"># Screen setup</span>
+WIDTH, HEIGHT = <span class="number">600</span>, <span class="number">600</span>
+screen = pygame.display.<span class="func">set_mode</span>((WIDTH, HEIGHT))
+pygame.display.<span class="func">set_caption</span>(<span class="string">"Dodge the Blocks!"</span>)
+
+<span class="comment"># Colors</span>
+WHITE = (<span class="number">255</span>, <span class="number">255</span>, <span class="number">255</span>)
+RED = (<span class="number">255</span>, <span class="number">0</span>, <span class="number">0</span>)
+BLUE = (<span class="number">0</span>, <span class="number">0</span>, <span class="number">255</span>)
+BLACK = (<span class="number">0</span>, <span class="number">0</span>, <span class="number">0</span>)
+
+<span class="comment"># Player</span>
+player_width = <span class="number">40</span>
+player_height = <span class="number">20</span>
+player_x = WIDTH <span class="operator">//</span> <span class="number">2</span> <span class="operator">-</span> player_width <span class="operator">//</span> <span class="number">2</span>
+player_y = HEIGHT <span class="operator">-</span> player_height <span class="operator">-</span> <span class="number">10</span>
+player_speed = <span class="number">8</span>
+
+<span class="comment"># Enemy blocks</span>
+enemies = []
+enemy_speed = <span class="number">4</span>
+enemy_spawn_rate = <span class="number">30</span>  <span class="comment"># Lower = more enemies</span>
+
+<span class="comment"># Score</span>
+score = <span class="number">0</span>
+font = pygame.font.<span class="func">SysFont</span>(<span class="keyword">None</span>, <span class="number">36</span>)
+
+<span class="comment"># Game loop</span>
+clock = pygame.time.<span class="func">Clock</span>()
+running = <span class="keyword">True</span>
+
+<span class="keyword">while</span> running:
+    <span class="comment"># Handle events (quit, key presses)</span>
+    <span class="keyword">for</span> event <span class="keyword">in</span> pygame.event.<span class="func">get</span>():
+        <span class="keyword">if</span> event.type == pygame.QUIT:
+            running = <span class="keyword">False</span>
+
+    <span class="comment"># Player movement (left/right)</span>
+    keys = pygame.key.<span class="func">get_pressed</span>()
+    <span class="keyword">if</span> (keys[pygame.K_LEFT] <span class="operator">or</span> keys[pygame.K_a]) <span class="operator">and</span> player_x > <span class="number">0</span>:
+        player_x -= player_speed
+    <span class="keyword">if</span> (keys[pygame.K_RIGHT] <span class="operator">or</span> keys[pygame.K_d]) <span class="operator">and</span> player_x < WIDTH <span class="operator">-</span> player_width:
+        player_x += player_speed
+
+    <span class="comment"># Spawn enemies randomly</span>
+    <span class="keyword">if</span> random.<span class="func">randint</span>(<span class="number">1</span>, enemy_spawn_rate) == <span class="number">1</span>:
+        enemy_width = random.<span class="func">randint</span>(<span class="number">30</span>, <span class="number">80</span>)
+        enemy_x = random.<span class="func">randint</span>(<span class="number">0</span>, WIDTH <span class="operator">-</span> enemy_width)
+        enemies.<span class="func">append</span>([enemy_x, <span class="operator">-</span><span class="number">20</span>, enemy_width, <span class="number">20</span>])  <span class="comment"># [x, y, width, height]</span>
+
+    <span class="comment"># Move enemies down</span>
+    <span class="keyword">for</span> enemy <span class="keyword">in</span> enemies[:]:
+        enemy[<span class="number">1</span>] += enemy_speed
+
+        <span class="comment"># Check collision with player</span>
+        <span class="keyword">if</span> (player_y < enemy[<span class="number">1</span>] + enemy[<span class="number">3</span>] <span class="operator">and</span>
+            player_y + player_height > enemy[<span class="number">1</span>] <span class="operator">and</span>
+            player_x < enemy[<span class="number">0</span>] + enemy[<span class="number">2</span>] <span class="operator">and</span>
+            player_x + player_width > enemy[<span class="number">0</span>]):
+            running = <span class="keyword">False</span>  <span class="comment"># Game over</span>
+
+        <span class="comment"># Remove enemies that go off-screen</span>
+        <span class="keyword">if</span> enemy[<span class="number">1</span>] > HEIGHT:
+            enemies.<span class="func">remove</span>(enemy)
+            score += <span class="number">1</span>
+
+    <span class="comment"># Draw everything</span>
+    screen.<span class="func">fill</span>(BLACK)
+    pygame.draw.<span class="func">rect</span>(screen, BLUE, (player_x, player_y, player_width, player_height))
+    <span class="keyword">for</span> enemy <span class="keyword">in</span> enemies:
+        pygame.draw.<span class="func">rect</span>(screen, RED, (enemy[<span class="number">0</span>], enemy[<span class="number">1</span>], enemy[<span class="number">2</span>], enemy[<span class="number">3</span>]))
+
+    <span class="comment"># Display score</span>
+    score_text = font.<span class="func">render</span>(<span class="string">f"Score: {score}"</span>, <span class="keyword">True</span>, WHITE)
+    screen.<span class="func">blit</span>(score_text, (<span class="number">10</span>, <span class="number">10</span>))
+
+    <span class="comment"># Update display</span>
+    pygame.display.<span class="func">flip</span>()
+    clock.<span class="func">tick</span>(<span class="number">80</span>)  <span class="comment"># 60 FPS</span>
+
+<span class="comment"># Game over screen</span>
+screen.<span class="func">fill</span>(BLACK)
+game_over_text = font.<span class="func">render</span>(<span class="string">f"OK BYE ARPIT Score: {score}"</span>, <span class="keyword">True</span>, WHITE)
+screen.<span class="func">blit</span>(game_over_text, (WIDTH<span class="operator">//</span><span class="number">2</span> - <span class="number">150</span>, HEIGHT<span class="operator">//</span><span class="number">2</span> - <span class="number">18</span>))
+pygame.display.<span class="func">flip</span>()
+pygame.time.<span class="func">wait</span>(<span class="number">3000</span>)  <span class="comment"># Show for 3 seconds</span>
+
+pygame.<span class="func">quit</span>()
+sys.<span class="func">exit</span>()</code></pre>
+        </div>
+        
+        <button class="copy-btn" onclick="copyCode()">Copy Code</button>
+        
+        <footer>
+            <p>Game code for "Dodge the Blocks!" - A Pygame tutorial project</p>
+        </footer>
+    </div>
+
+    <script>
+        function copyCode() {
+            const code = document.querySelector('code').textContent;
+            navigator.clipboard.writeText(code)
+                .then(() => {
+                    const btn = document.querySelector('.copy-btn');
+                    btn.textContent = 'Copied!';
+                    setTimeout(() => {
+                        btn.textContent = 'Copy Code';
+                    }, 2000);
+                });
+        }
+    </script>
+</body>
+</html>
